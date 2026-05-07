@@ -1,6 +1,6 @@
 🎓 Campus Connect — AI-Driven Community & Study Coordination
 > An AI-powered student collaboration platform for engineering colleges. Built as a frontend prototype for portfolio demonstration.
-![Live Demo](https://YOUR-USERNAME.github.io/campus-connect/)
+![Live Demo](https://tupegaurav.github.io/campus-connect/)
 ![PRD](#)
 ---
 📌 Project Overview
@@ -33,7 +33,7 @@ AI Layer (planned)	Python-based recommendation microservice
 🚀 Getting Started
 Run locally
 ```bash
-git clone https://github.com/YOUR-USERNAME/campus-connect.git
+git clone https://github.com/tupegaurav/campus-connect.git
 cd campus-connect
 # Open index.html in your browser — no build step needed
 open index.html
@@ -43,7 +43,7 @@ Push this repository to GitHub
 Go to Settings → Pages
 Under Source, select `main` branch and `/ (root)` folder
 Click Save — your site will be live at:
-`https://YOUR-USERNAME.github.io/campus-connect/`
+`https://tupegaurav.github.io/campus-connect/`
 ---
 📱 Features Walkthrough
 AI Group Matcher
