@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Campus Connect — Onboarding</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    body { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100svh; padding:var(--sp-6); }
+    .ob-shell { width:100%; max-width:520px; }
+    .ob-progress { display:flex; gap:var(--sp-2); margin-bottom:var(--sp-8); }
+    .ob-bar { flex:1; height:3px; border-radius:99px; background:var(--border); transition:background .4s; }
+    .ob-bar.done { background:var(--accent); }
+    .step { display:none; }
+    .step.active { display:block; animation: fadeUp .4s ease both; }
+    .step-icon { font-size:2.5rem; margin-bottom:var(--sp-4); }
+    .step h2 { font-family:var(--font-display); font-size:1.7rem; font-weight:800; color:var(--text-primary); margin-bottom:.5rem; letter-spacing:-.02em; }
+    .step p { font-family:var(--font-body); font-size:.95rem; color:var(--text-muted); line-height:1.65; margin-bottom:var(--sp-7); }
+
+    /* step 2 – profile form */
+    .form-group { margin-bottom:var(--sp-4); }
+    .form-group label { display:block; font-family:var(--font-body); font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:var(--sp-2); }
+    select.input { appearance:none; cursor:pointer; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-3); }
+
+    /* step 3 – preference chips */
+    .chips { display:flex; flex-wrap:wrap; gap:var(--sp-2); margin-bottom:var(--sp-7); }
+    .chip { padding:.5rem 1.1rem; border:1px solid var(--border); border-radius:99px; font-family:var(--font-body); font-size:.85rem; color:var(--text-muted); cursor:pointer; transition:all .2s; }
+    .chip.selected { border-color:var(--accent); color:var(--accent); background:rgba(99,211,158,.08); }
+    .chip:hover { border-color:var(--border-hover); color:var(--text-primary); }
+
+    /* nav row */
+    .ob-nav { display:flex; align-items:center; justify-content:space-between; margin-top:var(--sp-6); }
+    .step-count { font-family:var(--font-body); font-size:.8rem; color:var(--text-muted); }
+
+    /* subjects tags (step 2) */
+    .subject-select { display:flex; flex-wrap:wrap; gap:var(--sp-2); }
+    .subject-tag { padding:.45rem .9rem; border:1px solid var(--border); border-radius:.5rem; font-size:.8rem; font-family:var(--font-body); color:var(--text-muted); cursor:pointer; transition:all .2s; }
+    .subject-tag.sel { border-color:var(--blue); color:var(--blue); background:rgba(99,178,255,.08); }
+  </style>
+</head>
+<body>
+  <div class="ob-shell">
+    <div style="margin-bottom:var(--sp-8);">
+      <a href="../index.html" style="font-family:var(--font-display);font-weight:800;font-size:1.1rem;color:var(--text-primary);text-decoration:none;">Campus<span style="color:var(--accent);">Connect</span></a>
+    </div>
+
+    <div class="ob-progress">
+      <div class="ob-bar done" id="bar1"></div>
+      <div class="ob-bar" id="bar2"></div>
+      <div class="ob-bar" id="bar3"></div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step active" id="step1">
+      <div class="step-icon">👋</div>
+      <h2>Welcome to Campus Connect</h2>
+      <p>Your AI-powered study companion. In just 3 quick steps, we'll personalize your experience and match you with the right peers.</p>
+      <div style="display:flex;flex-direction:column;gap:var(--sp-3);margin-bottom:var(--sp-5);">
+        <div style="display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-4);background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);">
+          <span style="font-size:1.4rem;">🤖</span>
+          <div><div style="font-family:var(--font-display);font-weight:700;font-size:.95rem;color:var(--text-primary);margin-bottom:.2rem;">AI Group Matching</div><div style="font-family:var(--font-body);font-size:.82rem;color:var(--text-muted);">Get matched with peers who share your subjects and goals</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-4);background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);">
+          <span style="font-size:1.4rem;">📚</span>
+          <div><div style="font-family:var(--font-display);font-weight:700;font-size:.95rem;color:var(--text-primary);margin-bottom:.2rem;">Smart Resource Hub</div><div style="font-family:var(--font-body);font-size:.82rem;color:var(--text-muted);">Access verified notes and materials from your peers</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-4);background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);">
+          <span style="font-size:1.4rem;">💬</span>
+          <div><div style="font-family:var(--font-display);font-weight:700;font-size:.95rem;color:var(--text-primary);margin-bottom:.2rem;">Collaboration Board</div><div style="font-family:var(--font-body);font-size:.82rem;color:var(--text-muted);">One place for group chats, files, and task coordination</div></div>
+        </div>
+      </div>
+      <div class="ob-nav">
+        <span class="step-count">Step 1 of 3</span>
+        <button class="btn-primary" onclick="goTo(2)">Let's go →</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" id="step2">
+      <div class="step-icon">🎓</div>
+      <h2>Set up your profile</h2>
+      <p>This helps our AI match you with the most relevant study partners.</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Department</label>
+          <select class="input" id="dept">
+            <option value="">Select…</option>
+            <option>Computer Engineering</option>
+            <option>Mechanical Engineering</option>
+            <option>Electronics & Telecom</option>
+            <option>Civil Engineering</option>
+            <option>Information Technology</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <select class="input" id="year">
+            <option value="">Select…</option>
+            <option>1st Year</option>
+            <option>2nd Year</option>
+            <option>3rd Year</option>
+            <option>4th Year</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input class="input" type="text" placeholder="e.g. Anjali Sharma" id="name">
+      </div>
+      <div class="form-group">
+        <label>Enrolled Subjects <span style="color:var(--text-muted);font-size:.7rem;text-transform:none;letter-spacing:0;">(select all that apply)</span></label>
+        <div class="subject-select" id="subjectGrid">
+          <div class="subject-tag" onclick="toggleSubject(this)">Data Structures</div>
+          <div class="subject-tag" onclick="toggleSubject(this)">DBMS</div>
+          <div class="subject-tag" onclick="toggleSubject(this)">OS</div>
+          <div class="subject-tag" onclick="toggleSubject(this)">Computer Networks</div>
+          <div class="subject-tag" onclick="toggleSubject(this)">Algorithms</div>
+          <div class="subject-tag" onclick="toggleSubject(this)">Machine Learning</div>
+          <div class="subject-tag" onclick="toggleSubject(this)">Web Development</div>
+          <div class="subject-tag" onclick="toggleSubject(this)">Software Engineering</div>
+        </div>
+      </div>
+      <div class="ob-nav">
+        <button class="btn-ghost btn-sm" onclick="goTo(1)">← Back</button>
+        <span class="step-count">Step 2 of 3</span>
+        <button class="btn-primary" onclick="goTo(3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" id="step3">
+      <div class="step-icon">⚙️</div>
+      <h2>Your study preferences</h2>
+      <p>Help us understand how you like to study so we can find the best match for you.</p>
+
+      <div style="margin-bottom:var(--sp-5);">
+        <div style="font-family:var(--font-body);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-3);">Study Style</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Group Study 👥</div>
+          <div class="chip" onclick="toggleChip(this)">Solo + Check-ins 🧑‍💻</div>
+          <div class="chip" onclick="toggleChip(this)">Teach Others 🎤</div>
+          <div class="chip" onclick="toggleChip(this)">Problem Solving 🧩</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:var(--sp-5);">
+        <div style="font-family:var(--font-body);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-3);">Preferred Schedule</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Morning 🌅</div>
+          <div class="chip" onclick="toggleChip(this)">Afternoon ☀️</div>
+          <div class="chip" onclick="toggleChip(this)">Evening 🌆</div>
+          <div class="chip" onclick="toggleChip(this)">Late Night 🌙</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:var(--sp-5);">
+        <div style="font-family:var(--font-body);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-3);">Goal</div>
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Exam Prep 📝</div>
+          <div class="chip" onclick="toggleChip(this)">Project Work 🔧</div>
+          <div class="chip" onclick="toggleChip(this)">Skill Building 🚀</div>
+          <div class="chip" onclick="toggleChip(this)">Finding a Mentor 🧭</div>
+        </div>
+      </div>
+
+      <div class="ob-nav">
+        <button class="btn-ghost btn-sm" onclick="goTo(2)">← Back</button>
+        <span class="step-count">Step 3 of 3</span>
+        <button class="btn-primary" onclick="finish()">Find my matches 🤖</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function goTo(n) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step'+n).classList.add('active');
+      for (let i=1; i<=3; i++) {
+        document.getElementById('bar'+i).classList.toggle('done', i <= n);
+      }
+    }
+    function toggleChip(el) { el.classList.toggle('selected'); }
+    function toggleSubject(el) { el.classList.toggle('sel'); }
+    function finish() {
+      // Save name for dashboard
+      const name = document.getElementById('name').value || 'Anjali';
+      localStorage.setItem('cc_name', name);
+      window.location.href = 'matcher.html';
+    }
+  </script>
+</body>
+</html>
