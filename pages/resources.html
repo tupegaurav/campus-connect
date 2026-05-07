@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Campus Connect — Resource Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    .search-bar { position:relative; margin-bottom:var(--sp-5); }
+    .search-bar input { padding-left:3rem; font-size:1rem; height:3rem; }
+    .search-icon { position:absolute; left:1rem; top:50%; transform:translateY(-50%); font-size:1.1rem; pointer-events:none; }
+    .filter-tabs { display:flex; gap:var(--sp-2); flex-wrap:wrap; margin-bottom:var(--sp-5); }
+    .tab { padding:.45rem 1.1rem; border:1px solid var(--border); border-radius:99px; font-size:.82rem; font-family:var(--font-body); color:var(--text-muted); cursor:pointer; transition:all .2s; }
+    .tab.active { background:var(--accent); color:#0b1120; border-color:var(--accent); font-weight:600; }
+    .tab:hover:not(.active) { border-color:var(--border-hover); color:var(--text-primary); }
+
+    .resources-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:var(--sp-4); }
+    .resource-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:var(--sp-5); transition:border-color .25s,transform .2s; cursor:pointer; animation: fadeUp .4s ease both; }
+    .resource-card:hover { border-color:var(--border-hover); transform:translateY(-2px); }
+    .res-type { width:2.6rem; height:2.6rem; border-radius:.6rem; display:flex; align-items:center; justify-content:center; font-size:1.1rem; margin-bottom:var(--sp-4); }
+    .res-title { font-family:var(--font-display); font-weight:700; font-size:.95rem; color:var(--text-primary); margin-bottom:.4rem; line-height:1.35; }
+    .res-meta { font-family:var(--font-body); font-size:.78rem; color:var(--text-muted); margin-bottom:var(--sp-3); }
+    .res-footer { display:flex; align-items:center; justify-content:space-between; margin-top:var(--sp-4); padding-top:var(--sp-3); border-top:1px solid var(--border); }
+    .res-author { display:flex; align-items:center; gap:.5rem; font-family:var(--font-body); font-size:.75rem; color:var(--text-muted); }
+    .res-actions { display:flex; gap:.5rem; }
+    .res-btn { background:transparent; border:1px solid var(--border); border-radius:.4rem; padding:.35rem .7rem; font-size:.72rem; font-family:var(--font-body); color:var(--text-muted); cursor:pointer; transition:all .2s; }
+    .res-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .res-btn.saved { border-color:var(--accent); color:var(--accent); background:rgba(99,211,158,.08); }
+    .verified-badge { display:inline-flex; align-items:center; gap:.3rem; font-size:.68rem; font-family:var(--font-body); color:var(--accent); background:rgba(99,211,158,.1); padding:.2rem .55rem; border-radius:99px; }
+
+    /* upload modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); z-index:300; display:none; align-items:center; justify-content:center; padding:var(--sp-5); }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-xl); padding:var(--sp-7); width:100%; max-width:480px; animation:fadeUp .3s ease; }
+    .modal h3 { font-family:var(--font-display); font-size:1.2rem; font-weight:800; color:var(--text-primary); margin-bottom:var(--sp-5); }
+    .form-group { margin-bottom:var(--sp-4); }
+    .form-group label { display:block; font-family:var(--font-body); font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:var(--sp-2); }
+    .drop-zone { border:2px dashed var(--border); border-radius:var(--radius); padding:var(--sp-8); text-align:center; cursor:pointer; transition:border-color .2s; }
+    .drop-zone:hover { border-color:var(--accent); }
+    .drop-zone p { font-family:var(--font-body); font-size:.85rem; color:var(--text-muted); margin-top:.5rem; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-brand">Campus<span>Connect</span></div>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="matcher.html">AI Matcher</a>
+      <a href="resources.html" class="active">Resources</a>
+    </div>
+    <button class="btn-primary btn-sm" onclick="document.getElementById('uploadModal').classList.add('open')">+ Upload</button>
+  </nav>
+
+  <div class="page-shell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">Campus<span>Connect</span></div>
+      <a href="dashboard.html" class="sidebar-link"><span class="sidebar-icon">📊</span> Dashboard</a>
+      <a href="matcher.html" class="sidebar-link"><span class="sidebar-icon">🤖</span> AI Matcher</a>
+      <a href="resources.html" class="sidebar-link active"><span class="sidebar-icon">📚</span> Resources</a>
+      <a href="collab.html" class="sidebar-link"><span class="sidebar-icon">💬</span> Collaboration</a>
+      <div style="margin-top:auto;padding-top:var(--sp-6);">
+        <a href="../index.html" class="sidebar-link"><span class="sidebar-icon">🚪</span> Logout</a>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <div class="page-header">
+        <h1>📚 Smart Resource Hub</h1>
+        <p>Verified study materials organized by subject — uploaded by peers and faculty</p>
+      </div>
+
+      <div class="page-body">
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input class="input" type="text" placeholder="Search resources, subjects, topics…" id="searchInput" oninput="filterResources()">
+        </div>
+
+        <div class="filter-tabs" id="filterTabs">
+          <div class="tab active" onclick="setTab(this,'all')">All</div>
+          <div class="tab" onclick="setTab(this,'ds')">Data Structures</div>
+          <div class="tab" onclick="setTab(this,'dbms')">DBMS</div>
+          <div class="tab" onclick="setTab(this,'os')">Operating Systems</div>
+          <div class="tab" onclick="setTab(this,'cn')">Computer Networks</div>
+          <div class="tab" onclick="setTab(this,'web')">Web Dev</div>
+          <div class="tab" onclick="setTab(this,'ml')">Machine Learning</div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4);">
+          <div style="font-family:var(--font-body);font-size:.85rem;color:var(--text-muted);" id="countLabel">Showing 12 resources</div>
+          <select class="input" style="width:auto;padding:.4rem .9rem;font-size:.82rem;" onchange="sortResources(this.value)">
+            <option value="date">Sort: Latest</option>
+            <option value="rating">Sort: Most saved</option>
+            <option value="verified">Sort: Verified first</option>
+          </select>
+        </div>
+
+        <div class="resources-grid" id="resourcesGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Modal -->
+  <div class="modal-overlay" id="uploadModal" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h3>📤 Upload Resource</h3>
+      <div class="form-group">
+        <label>Title</label>
+        <input class="input" type="text" placeholder="e.g. Data Structures Unit 4 Notes" id="uploadTitle">
+      </div>
+      <div class="form-group">
+        <label>Subject</label>
+        <select class="input" id="uploadSubject">
+          <option>Data Structures</option><option>DBMS</option><option>Operating Systems</option>
+          <option>Computer Networks</option><option>Web Development</option><option>Machine Learning</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>File</label>
+        <div class="drop-zone" onclick="alert('File picker would open here in a full implementation')">
+          <div style="font-size:2rem;">📎</div>
+          <p>Click to select a file or drag & drop here<br><span style="font-size:.72rem;">PDF, DOCX, PPTX up to 20MB</span></p>
+        </div>
+      </div>
+      <div style="display:flex;gap:var(--sp-3);margin-top:var(--sp-4);">
+        <button class="btn-primary" style="flex:1;" onclick="submitUpload()">Upload Resource</button>
+        <button class="btn-ghost" onclick="document.getElementById('uploadModal').classList.remove('open')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const resources = [
+      { id:1, icon:'📝', title:'DS Unit 4 — Trees & Graphs', subject:'ds', subjectLabel:'Data Structures', type:'Notes', author:'Rohit K.', time:'2h ago', saves:24, verified:false },
+      { id:2, icon:'📘', title:'DBMS Normalization Cheatsheet', subject:'dbms', subjectLabel:'DBMS', type:'Cheatsheet', author:'Faculty', time:'1d ago', saves:67, verified:true },
+      { id:3, icon:'🎯', title:'OS Mock Test Paper 2024', subject:'os', subjectLabel:'Operating Systems', type:'Past Paper', author:'Sneha P.', time:'1d ago', saves:43, verified:false },
+      { id:4, icon:'💡', title:'TCP/IP & Routing Notes', subject:'cn', subjectLabel:'Computer Networks', type:'Notes', author:'Aryan D.', time:'2d ago', saves:31, verified:false },
+      { id:5, icon:'🔧', title:'HTML/CSS Flexbox Guide', subject:'web', subjectLabel:'Web Development', type:'Guide', author:'Karan M.', time:'2d ago', saves:19, verified:false },
+      { id:6, icon:'🤖', title:'ML Supervised Learning Summary', subject:'ml', subjectLabel:'Machine Learning', type:'Summary', author:'Priya J.', time:'3d ago', saves:52, verified:true },
+      { id:7, icon:'📋', title:'DS Sorting Algorithm Comparison', subject:'ds', subjectLabel:'Data Structures', type:'Notes', author:'Faculty', time:'4d ago', saves:88, verified:true },
+      { id:8, icon:'🗂️', title:'DBMS ER Diagram Practice Set', subject:'dbms', subjectLabel:'DBMS', type:'Practice', author:'Anjali S.', time:'5d ago', saves:36, verified:false },
+      { id:9, icon:'⚙️', title:'Process Scheduling Algorithms', subject:'os', subjectLabel:'Operating Systems', type:'Notes', author:'Faculty', time:'6d ago', saves:74, verified:true },
+      { id:10, icon:'🌐', title:'HTTP & DNS Explained', subject:'cn', subjectLabel:'Computer Networks', type:'Guide', author:'Rohit K.', time:'1w ago', saves:28, verified:false },
+      { id:11, icon:'⚡', title:'JavaScript ES6 Cheatsheet', subject:'web', subjectLabel:'Web Development', type:'Cheatsheet', author:'Aryan D.', time:'1w ago', saves:61, verified:false },
+      { id:12, icon:'📊', title:'Neural Networks — Visual Notes', subject:'ml', subjectLabel:'Machine Learning', type:'Notes', author:'Faculty', time:'1w ago', saves:45, verified:true },
+    ];
+
+    let saved = new Set();
+    let currentFilter = 'all';
+    let currentSort = 'date';
+
+    function render(list) {
+      document.getElementById('countLabel').textContent = `Showing ${list.length} resource${list.length!==1?'s':''}`;
+      document.getElementById('resourcesGrid').innerHTML = list.map((r,i) => `
+        <div class="resource-card" style="animation-delay:${i*.05}s" data-subject="${r.subject}" data-title="${r.title.toLowerCase()}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:var(--sp-4);">
+            <div class="res-type" style="background:rgba(99,211,158,.1);">${r.icon}</div>
+            ${r.verified ? '<span class="verified-badge">✓ Verified</span>' : ''}
+          </div>
+          <div class="res-title">${r.title}</div>
+          <div class="res-meta">${r.subjectLabel} · ${r.type}</div>
+          <div class="res-footer">
+            <div class="res-author"><span style="font-size:.8rem;">👤</span>${r.author} · ${r.time}</div>
+            <div class="res-actions">
+              <button class="res-btn ${saved.has(r.id)?'saved':''}" onclick="toggleSave(event,${r.id},this)">${saved.has(r.id)?'★ Saved':'☆ Save'}</button>
+              <button class="res-btn" onclick="alert('Download would begin here')">↓</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setTab(el, filter) {
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      el.classList.add('active');
+      currentFilter = filter;
+      applyFilters();
+    }
+
+    function filterResources() { applyFilters(); }
+
+    function sortResources(val) { currentSort = val; applyFilters(); }
+
+    function applyFilters() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      let list = resources.filter(r => {
+        const matchFilter = currentFilter === 'all' || r.subject === currentFilter;
+        const matchSearch = !q || r.title.toLowerCase().includes(q) || r.subjectLabel.toLowerCase().includes(q);
+        return matchFilter && matchSearch;
+      });
+      if(currentSort === 'rating') list.sort((a,b)=>b.saves-a.saves);
+      else if(currentSort === 'verified') list.sort((a,b)=>b.verified-a.verified);
+      render(list);
+    }
+
+    function toggleSave(e, id, btn) {
+      e.stopPropagation();
+      if(saved.has(id)) { saved.delete(id); btn.textContent='☆ Save'; btn.classList.remove('saved'); }
+      else { saved.add(id); btn.textContent='★ Saved'; btn.classList.add('saved'); }
+    }
+
+    function closeModal(e) { document.getElementById('uploadModal').classList.remove('open'); }
+
+    function submitUpload() {
+      const title = document.getElementById('uploadTitle').value;
+      if(!title) { alert('Please enter a resource title.'); return; }
+      document.getElementById('uploadModal').classList.remove('open');
+      alert(`✅ "${title}" uploaded successfully! It will appear in the hub after review.`);
+    }
+
+    render(resources);
+  </script>
+</body>
+</html>
