@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Campus Connect — Collaboration Board</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    .collab-layout { display:flex; height:calc(100vh - 57px); overflow:hidden; }
+    .groups-panel { width:260px; flex-shrink:0; border-right:1px solid var(--border); background:var(--surface); display:flex; flex-direction:column; }
+    .groups-panel-head { padding:var(--sp-5) var(--sp-4); border-bottom:1px solid var(--border); }
+    .groups-panel-head h2 { font-family:var(--font-display); font-size:.95rem; font-weight:700; color:var(--text-primary); }
+    .groups-list { flex:1; overflow-y:auto; padding:var(--sp-3); }
+    .group-row { display:flex; align-items:center; gap:var(--sp-3); padding:var(--sp-3); border-radius:var(--radius); cursor:pointer; transition:background .2s; }
+    .group-row:hover { background:var(--surface-2); }
+    .group-row.active { background:rgba(99,211,158,.1); }
+    .group-dot { width:.5rem; height:.5rem; border-radius:50%; background:var(--accent); flex-shrink:0; }
+    .group-dot.idle { background:var(--text-muted); }
+    .group-row-name { font-family:var(--font-body); font-size:.85rem; color:var(--text-primary); flex:1; }
+    .group-unread { background:var(--accent); color:#0b1120; font-size:.65rem; font-family:var(--font-display); font-weight:700; border-radius:99px; width:1.2rem; height:1.2rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+    /* Chat area */
+    .chat-area { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .chat-header { padding:var(--sp-4) var(--sp-5); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:var(--sp-4); }
+    .chat-header h2 { font-family:var(--font-display); font-size:1rem; font-weight:700; color:var(--text-primary); }
+    .chat-header .members { font-family:var(--font-body); font-size:.78rem; color:var(--text-muted); margin-top:.15rem; }
+    .chat-header-actions { margin-left:auto; display:flex; gap:var(--sp-2); }
+    .icon-btn { width:2.2rem; height:2.2rem; border-radius:var(--radius); background:var(--surface-2); border:1px solid var(--border); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.95rem; transition:border-color .2s; }
+    .icon-btn:hover { border-color:var(--accent); }
+
+    .messages { flex:1; overflow-y:auto; padding:var(--sp-5); display:flex; flex-direction:column; gap:var(--sp-4); }
+    .msg { display:flex; gap:var(--sp-3); align-items:flex-end; max-width:78%; }
+    .msg.mine { align-self:flex-end; flex-direction:row-reverse; }
+    .msg-bubble { background:var(--surface-2); border-radius:var(--radius-lg) var(--radius-lg) var(--radius-lg) .25rem; padding:var(--sp-3) var(--sp-4); font-family:var(--font-body); font-size:.88rem; color:var(--text-primary); line-height:1.55; }
+    .msg.mine .msg-bubble { background:rgba(99,211,158,.12); border-radius:var(--radius-lg) var(--radius-lg) .25rem var(--radius-lg); }
+    .msg-meta { font-family:var(--font-body); font-size:.68rem; color:var(--text-muted); margin-top:.3rem; white-space:nowrap; }
+    .msg.mine .msg-meta { text-align:right; }
+
+    /* File attachment bubble */
+    .file-bubble { display:flex; align-items:center; gap:var(--sp-3); padding:var(--sp-3) var(--sp-4); background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); font-size:.83rem; font-family:var(--font-body); color:var(--text-primary); }
+    .file-bubble .file-icon { font-size:1.2rem; flex-shrink:0; }
+    .file-bubble .file-name { font-weight:500; }
+    .file-bubble .file-size { font-size:.72rem; color:var(--text-muted); }
+
+    /* Input row */
+    .chat-input-row { padding:var(--sp-4) var(--sp-5); border-top:1px solid var(--border); display:flex; gap:var(--sp-3); align-items:flex-end; }
+    .chat-input-wrap { flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:var(--sp-3) var(--sp-4); transition:border-color .2s; }
+    .chat-input-wrap:focus-within { border-color:var(--accent); }
+    .chat-input-wrap textarea { width:100%; background:transparent; border:none; outline:none; color:var(--text-primary); font-family:var(--font-body); font-size:.9rem; resize:none; min-height:1.4rem; max-height:6rem; line-height:1.5; }
+    .chat-input-wrap textarea::placeholder { color:var(--text-muted); opacity:.5; }
+    .send-btn { width:2.6rem; height:2.6rem; border-radius:var(--radius); background:var(--accent); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; transition:transform .2s; flex-shrink:0; }
+    .send-btn:hover { transform:scale(1.08); }
+
+    /* Tasks panel */
+    .tasks-panel { width:240px; flex-shrink:0; border-left:1px solid var(--border); background:var(--surface); display:flex; flex-direction:column; overflow-y:auto; }
+    .tasks-panel-head { padding:var(--sp-5) var(--sp-4); border-bottom:1px solid var(--border); }
+    .tasks-panel-head h2 { font-family:var(--font-display); font-size:.95rem; font-weight:700; color:var(--text-primary); }
+    .task-item { display:flex; align-items:flex-start; gap:var(--sp-3); padding:var(--sp-4); border-bottom:1px solid var(--border); }
+    .task-check { width:1.1rem; height:1.1rem; border-radius:.25rem; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0; margin-top:.15rem; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+    .task-check.done { background:var(--accent); border-color:var(--accent); }
+    .task-text { font-family:var(--font-body); font-size:.82rem; color:var(--text-primary); line-height:1.45; }
+    .task-text.done { text-decoration:line-through; color:var(--text-muted); }
+    .task-assignee { font-size:.7rem; color:var(--text-muted); margin-top:.2rem; }
+    @media(max-width:900px){ .tasks-panel { display:none; } }
+    @media(max-width:600px){ .groups-panel { display:none; } }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-brand">Campus<span>Connect</span></div>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="matcher.html">AI Matcher</a>
+      <a href="resources.html">Resources</a>
+    </div>
+    <a href="dashboard.html" class="btn-ghost btn-sm">← Dashboard</a>
+  </nav>
+
+  <div class="collab-layout">
+    <!-- Groups list -->
+    <div class="groups-panel">
+      <div class="groups-panel-head">
+        <h2>💬 My Groups</h2>
+      </div>
+      <div class="groups-list">
+        <div class="group-row active" onclick="switchGroup(this,'DS + Algorithms Sprint','4 members','#chat-ds')">
+          <div class="group-dot"></div>
+          <span class="group-row-name">DS + Algorithms Sprint</span>
+          <span class="group-unread">2</span>
+        </div>
+        <div class="group-row" onclick="switchGroup(this,'DBMS Study Circle','3 members','#chat-dbms')">
+          <div class="group-dot"></div>
+          <span class="group-row-name">DBMS Study Circle</span>
+        </div>
+        <div class="group-row" onclick="switchGroup(this,'Web Dev Project Group','5 members','#chat-web')">
+          <div class="group-dot idle"></div>
+          <span class="group-row-name">Web Dev Project Group</span>
+        </div>
+      </div>
+      <div style="padding:var(--sp-4);">
+        <a href="matcher.html" class="btn-ghost btn-sm" style="width:100%;text-align:center;display:block;box-sizing:border-box;">+ Find New Group</a>
+      </div>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-area">
+      <div class="chat-header">
+        <div>
+          <h2 id="chatGroupName">DS + Algorithms Sprint</h2>
+          <div class="members" id="chatMembers">4 members · Rohit K., Priya J., Aryan D., You</div>
+        </div>
+        <div class="chat-header-actions">
+          <div class="icon-btn" title="Members" onclick="alert('Member list panel coming soon')">👥</div>
+          <div class="icon-btn" title="Attach file" onclick="alert('File upload: link your Google Drive or upload directly')">📎</div>
+          <div class="icon-btn" title="Schedule session" onclick="alert('Session scheduler coming soon')">📅</div>
+        </div>
+      </div>
+
+      <div class="messages" id="messagesArea">
+        <div style="text-align:center;font-family:var(--font-body);font-size:.75rem;color:var(--text-muted);padding:var(--sp-2) 0;">Today · May 07</div>
+
+        <div class="msg">
+          <div class="avatar avatar-green">RK</div>
+          <div>
+            <div style="font-family:var(--font-display);font-size:.75rem;font-weight:600;color:var(--text-muted);margin-bottom:.3rem;">Rohit K.</div>
+            <div class="msg-bubble">Hey everyone! Should we start with trees or try some graph problems first?</div>
+            <div class="msg-meta">6:12 PM</div>
+          </div>
+        </div>
+
+        <div class="msg">
+          <div class="avatar avatar-blue">PJ</div>
+          <div>
+            <div style="font-family:var(--font-display);font-size:.75rem;font-weight:600;color:var(--text-muted);margin-bottom:.3rem;">Priya J.</div>
+            <div class="msg-bubble">Trees first imo — they come before graphs in the syllabus</div>
+            <div class="msg-meta">6:14 PM</div>
+          </div>
+        </div>
+
+        <div class="msg">
+          <div class="avatar avatar-pink">AD</div>
+          <div>
+            <div style="font-family:var(--font-display);font-size:.75rem;font-weight:600;color:var(--text-muted);margin-bottom:.3rem;">Aryan D.</div>
+            <div>
+              <div class="file-bubble">
+                <span class="file-icon">📄</span>
+                <div><div class="file-name">DS_Unit4_Trees_Notes.pdf</div><div class="file-size">2.4 MB · PDF</div></div>
+                <button style="background:transparent;border:1px solid var(--border);border-radius:.4rem;padding:.25rem .6rem;font-size:.7rem;color:var(--text-muted);cursor:pointer;margin-left:auto;" onclick="alert('Download: DS_Unit4_Trees_Notes.pdf')">↓</button>
+              </div>
+            </div>
+            <div class="msg-meta">6:18 PM</div>
+          </div>
+        </div>
+
+        <div class="msg">
+          <div class="avatar avatar-blue">PJ</div>
+          <div>
+            <div style="font-family:var(--font-display);font-size:.75rem;font-weight:600;color:var(--text-muted);margin-bottom:.3rem;">Priya J.</div>
+            <div class="msg-bubble">Perfect, thanks Aryan! I'll review pages 12–24 before tonight's session 📖</div>
+            <div class="msg-meta">6:20 PM</div>
+          </div>
+        </div>
+
+        <div class="msg mine">
+          <div class="avatar avatar-green">AS</div>
+          <div>
+            <div class="msg-bubble">I just uploaded a practice set from last year's exam too — should help with revision!</div>
+            <div class="msg-meta">6:23 PM · ✓ Seen</div>
+          </div>
+        </div>
+
+        <div class="msg">
+          <div class="avatar avatar-green">RK</div>
+          <div>
+            <div style="font-family:var(--font-display);font-size:.75rem;font-weight:600;color:var(--text-muted);margin-bottom:.3rem;">Rohit K.</div>
+            <div class="msg-bubble">Nice! See everyone at 6 PM tonight then 🎯</div>
+            <div class="msg-meta">6:25 PM</div>
+          </div>
+        </div>
+
+        <div id="extraMessages"></div>
+      </div>
+
+      <div class="chat-input-row">
+        <div class="chat-input-wrap">
+          <textarea id="chatInput" placeholder="Type a message…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        </div>
+        <button class="icon-btn" onclick="alert('Attach file')" title="Attach">📎</button>
+        <button class="send-btn" onclick="sendMessage()" title="Send">➤</button>
+      </div>
+    </div>
+
+    <!-- Tasks panel -->
+    <div class="tasks-panel">
+      <div class="tasks-panel-head"><h2>✅ Group Tasks</h2></div>
+      <div id="tasksList">
+        <div class="task-item">
+          <div class="task-check done" onclick="toggleTask(this)">✓</div>
+          <div><div class="task-text done">Review Binary Trees (Ch. 7)</div><div class="task-assignee">Rohit K. · Done</div></div>
+        </div>
+        <div class="task-item">
+          <div class="task-check" onclick="toggleTask(this)"></div>
+          <div><div class="task-text">Complete BST practice problems</div><div class="task-assignee">Priya J. · Due tonight</div></div>
+        </div>
+        <div class="task-item">
+          <div class="task-check" onclick="toggleTask(this)"></div>
+          <div><div class="task-text">Prepare graph algorithms summary</div><div class="task-assignee">Aryan D. · Due May 10</div></div>
+        </div>
+        <div class="task-item">
+          <div class="task-check" onclick="toggleTask(this)"></div>
+          <div><div class="task-text">Upload unit 5 notes</div><div class="task-assignee">You · Due May 12</div></div>
+        </div>
+        <div class="task-item">
+          <div class="task-check done" onclick="toggleTask(this)">✓</div>
+          <div><div class="task-text done">Schedule tonight's session</div><div class="task-assignee">Rohit K. · Done</div></div>
+        </div>
+      </div>
+      <div style="padding:var(--sp-4);">
+        <button class="btn-ghost btn-sm" style="width:100%;" onclick="addTask()">+ Add Task</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchGroup(el, name, members) {
+      document.querySelectorAll('.group-row').forEach(r=>r.classList.remove('active'));
+      el.classList.add('active');
+      const unread = el.querySelector('.group-unread');
+      if(unread) unread.remove();
+      document.getElementById('chatGroupName').textContent = name;
+      document.getElementById('chatMembers').textContent = members + ' · (tap to load messages)';
+    }
+
+    function sendMessage() {
+      const ta = document.getElementById('chatInput');
+      const text = ta.value.trim();
+      if(!text) return;
+      const container = document.getElementById('extraMessages');
+      const now = new Date();
+      const timeStr = now.getHours()+':'+(now.getMinutes().toString().padStart(2,'0'))+' PM';
+      const div = document.createElement('div');
+      div.className = 'msg mine';
+      div.innerHTML = `
+        <div class="avatar avatar-green">AS</div>
+        <div>
+          <div class="msg-bubble">${text.replace(/</g,'&lt;')}</div>
+          <div class="msg-meta">${timeStr} · ✓</div>
+        </div>`;
+      div.style.animation = 'fadeUp .3s ease both';
+      container.appendChild(div);
+      ta.value = ''; ta.style.height = 'auto';
+      const msgs = document.getElementById('messagesArea');
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function handleKey(e) { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); } }
+    function autoResize(el) { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+    function toggleTask(el) {
+      el.classList.toggle('done');
+      const textEl = el.nextElementSibling.querySelector('.task-text');
+      textEl.classList.toggle('done');
+      el.textContent = el.classList.contains('done') ? '✓' : '';
+    }
+    function addTask() {
+      const name = prompt('New task description:');
+      if(!name) return;
+      const list = document.getElementById('tasksList');
+      const div = document.createElement('div');
+      div.className = 'task-item';
+      div.innerHTML = `<div class="task-check" onclick="toggleTask(this)"></div><div><div class="task-text">${name.replace(/</g,'&lt;')}</div><div class="task-assignee">You · No due date</div></div>`;
+      list.appendChild(div);
+    }
+  </script>
+</body>
+</html>
